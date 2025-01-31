@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import TaskForm from "./components/TaskForm";
+import IcBaselineEdit from "./components/IcBaselineEdit";
+import IcBaselineCancel from "./components/IcBaselineCancel";
+import IcBaselineSave from "./components/IcBaselineSave";
 
 interface Task {
   text: string;
@@ -95,16 +98,16 @@ export default function Dashboard() {
             {/* Botones de acción */}
             <div className="flex gap-2">
               {editingIndex === index ? (
-                <button onClick={() => handleSaveEdit(index)} className="btn btn-sm btn-success">
-                   💾
+                <button onClick={() => handleSaveEdit(index)} className="btn btn-sm btn-outline btn-success">
+                   <IcBaselineSave/>
                 </button>
               ) : (
-                <button onClick={() => handleEditTask(index)} className="btn btn-sm btn-warning">
-                  ✏
+                <button onClick={() => handleEditTask(index)} className="btn btn-sm btn-outline ">
+                  <IcBaselineEdit/>
                 </button>
               )}
-              <button onClick={() => handleDeleteTask(index)} className="btn btn-sm btn-error">
-                ❌
+              <button onClick={() => handleDeleteTask(index)} className="btn btn-sm btn-outline btn-error">
+                <IcBaselineCancel/>
               </button>
             </div>
           </li>

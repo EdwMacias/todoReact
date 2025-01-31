@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-
+import IcRoundPlus from "./IcRoundPlus";
 interface TaskFormProps {
   onAddTask: (task: string) => void;
 }
@@ -19,12 +19,12 @@ export default function TaskForm({ onAddTask }: TaskFormProps) {
     <form onSubmit={handleSubmit} className="flex gap-2">
       <input
         type="text"
-        placeholder="Nueva tarea..."
+        placeholder="Nueva tarea"
         className="input input-bordered w-full"
         value={task}
         onChange={(e) => setTask(e.target.value)}
       />
-      <button type="submit" className="btn btn-ghost-primary">Agregar</button>
+      <button type="submit" className="btn btn-outline btn-primary"><IcRoundPlus/></button>
     </form>
   );
 }
