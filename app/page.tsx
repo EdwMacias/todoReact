@@ -1,118 +1,54 @@
 "use client";
 import { useState, useEffect } from "react";
-import TaskForm from "./components/TaskForm";
-import IcBaselineEdit from "./components/IcBaselineEdit";
-import IcBaselineCancel from "./components/IcBaselineCancel";
-import IcBaselineSave from "./components/IcBaselineSave";
+import TaskChart from "./components/TaskChart";
+import Link from "next/link";
 
 interface Task {
-  text: string;
+  title: string;
+  description: string;
+  priority: "Alta" | "Media" | "Baja";
   completed: boolean;
 }
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editText, setEditText] = useState("");
 
-  // Cargar tareas desde localStorage al montar el componente
   useEffect(() => {
     const savedTasks = localStorage.getItem("tasks");
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks)); // Convertir JSON a array de tareas
-    }
+    if (savedTasks) setTasks(JSON.parse(savedTasks));
   }, []);
 
-  // Guardar tareas en localStorage cada vez que cambien
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  const handleAddTask = (newTask: string) => {
-    setTasks([...tasks, { text: newTask, completed: false }]);
-  };
-
-  const handleDeleteTask = (index: number) => {
-    setTasks(tasks.filter((_, i) => i !== index));
-  };
-
-  const handleToggleTask = (index: number) => {
-    setTasks(
-      tasks.map((task, i) =>
-        i === index ? { ...task, completed: !task.completed } : task
-      )
-    );
-  };
-
-  const handleEditTask = (index: number) => {
-    setEditingIndex(index);
-    setEditText(tasks[index].text);
-  };
-
-  const handleSaveEdit = (index: number) => {
-    if (editText.trim() === "") return; // Evitar tareas vacías
-    const updatedTasks = [...tasks];
-    updatedTasks[index].text = editText;
-    setTasks(updatedTasks);
-    setEditingIndex(null);
-    setEditText("");
-  };
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter((task) => task.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+  const highPriority = tasks.filter((task) => task.priority === "Alta").length;
+  const mediumPriority = tasks.filter((task) => task.priority === "Media").length;
+  const lowPriority = tasks.filter((task) => task.priority === "Baja").length;
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Lista de Tareas</h1>
+      <h1 className="text-2xl font-bold">📊 Dashboard de Tareas</h1>
 
-      {/* Formulario para agregar tareas */}
-      <TaskForm onAddTask={handleAddTask} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-base-200 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-bold">Total de Tareas</h2>
+          <p className="text-3xl font-semibold">{totalTasks}</p>
+        </div>
+        <div className="bg-green-200 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-bold">Tareas Completadas</h2>
+          <p className="text-3xl font-semibold">{completedTasks}</p>
+        </div>
+        <div className="bg-yellow-200 p-4 rounded-lg shadow">
+          <h2 className="text-lg font-bold">Tareas Pendientes</h2>
+          <p className="text-3xl font-semibold">{pendingTasks}</p>
+        </div>
+      </div>
 
-      {/* Mostrar tareas agregadas */}
-      <ul className="space-y-2">
-        {tasks.map((task, index) => (
-          <li
-            key={index}
-            className={`flex justify-between items-center bg-base-200 p-3 rounded-lg shadow ${
-              task.completed ? "opacity-50 line-through" : ""
-            }`}
-          >
-            {/* Edición en línea */}
-            <div className="flex gap-2 items-center flex-1">
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => handleToggleTask(index)}
-                className="checkbox checkbox-primary"
-              />
+      {/* Gráfica de distribución */}
+      <TaskChart tasks={tasks} />
 
-              {editingIndex === index ? (
-                <input
-                  type="text"
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  className="input input-sm w-full mx-1"
-                />
-              ) : (
-                <span>{task.text}</span>
-              )}
-            </div>
-
-            {/* Botones de acción */}
-            <div className="flex gap-2">
-              {editingIndex === index ? (
-                <button onClick={() => handleSaveEdit(index)} className="btn btn-sm btn-outline btn-success">
-                   <IcBaselineSave/>
-                </button>
-              ) : (
-                <button onClick={() => handleEditTask(index)} className="btn btn-sm btn-outline ">
-                  <IcBaselineEdit/>
-                </button>
-              )}
-              <button onClick={() => handleDeleteTask(index)} className="btn btn-sm btn-outline btn-error">
-                <IcBaselineCancel/>
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Botón para volver a la lista de tareas */}
+      <Link href="/todo" className="btn btn-primary">Tareas</Link>
     </div>
   );
 }
